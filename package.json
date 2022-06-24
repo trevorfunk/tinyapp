@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/trevorfunk/tinyapp/issues"
   },
-  "homepage": "https://github.com/trevorfunk/tinyapp#readme"
+  "homepage": "https://github.com/trevorfunk/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
 }
