@@ -34,12 +34,18 @@ app.post("/urls", (req, res) => {
  const urlId = generateRandomString()
  urlDatabase[urlId] = req.body.longURL
  res.redirect(`/urls/${urlId}`);
- console.log(urlDatabase);
+ console.log(req);
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
  delete urlDatabase[req.params.shortURL];
     res.redirect('/urls');
+    console.log(req);
+})
+
+app.post("/urls/:shortURL/edit", (req, res) => {
+ const shortURL = req.params.shortURL
+    res.redirect(`/urls/${shortURL}`);
 })
 
 app.listen(PORT, () => {
