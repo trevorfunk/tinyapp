@@ -30,12 +30,20 @@ app.get("/urls/new", (req, res) => {
 res.render("urls_new", templateVars);
 });
 
+app.get("/register", (req, res) => {
+ const templateVars = { 
+  username: req.cookies["username"],
+  shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+ res.render("urls_registration", templateVars)
+})
+
 app.get("/urls/:shortURL", (req, res) => {
  const templateVars = { 
  username: req.cookies["username"],
  shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
  res.render("urls_show", templateVars)
 });
+
 
 // POST ROUTES //
 app.post("/urls", (req, res) => {
