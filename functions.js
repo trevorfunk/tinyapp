@@ -1,4 +1,4 @@
-function generateRandomString() {
+const generateRandomString = () => {
  const defaultArray = ["", "", "", "", "", ""]
  const newArray = []
 
@@ -8,8 +8,25 @@ for (const position of defaultArray) {
   const index = Math.floor(Math.random() * character.length)
   newArray.push(character[index]);
 }
-const randomUrl = newArray.join("");
-return randomUrl;
+const randomString = newArray.join("");
+return randomString;
 }
 
-module.exports = generateRandomString;
+const emailCheck = (newEmail, database) => {
+ for (const user in database) {
+  if (newEmail === database[user].email) {
+   return true;
+  }
+ }
+ return false;
+};
+
+const currentUser = (email, password, database) => {
+ for (const userId in database) {
+  const user = database[userId];
+  if (user.email === email && user.password === password) {
+   return user;
+  }
+ }
+}
+module.exports = { generateRandomString, emailCheck, currentUser };
