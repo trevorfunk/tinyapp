@@ -1,6 +1,7 @@
-const { generateRandomString, emailCheck, currentUser, checkShortUrl, urlsForUser, isIdOwner } = require("./functions")
+const { generateRandomString, emailCheck, currentUser, checkShortUrl, urlsForUser, isIdOwner, addNewUser } = require("./functions")
 const express = require("express");
-const cookieParser = require("cookie-parser")
+const cookieParser = require("cookie-parser");
+const bcrypt = require('bcryptjs');
 const app = express();
 const bodyParser = require("body-parser");
 const PORT = 8080;
@@ -156,7 +157,6 @@ app.post("/login", (req, res) => {
   res.cookie("user_id", user.id);
   res.redirect("/urls");
  }
- console.log(usersDatabase)
 });
 
 app.post("/logout", (req, res) => {
@@ -166,17 +166,16 @@ app.post("/logout", (req, res) => {
 
 app.post("/register", (req, res) => {
  const { email, password } = req.body;
+ console.log("THIS ", req.body);
  if (email === '' || password === '') {
   res.status(400).send('Both email and password are required');
  } else if (emailCheck(email, usersDatabase)) {
   res.status(400).send('user email already in use');
  } else {
-  const userId = generateRandomString()
-  const user = { id: userId, ...req.body }
-  usersDatabase[userId] = user
-  console.log(usersDatabase)
-  res.cookie("user_id", userId)
-  res.redirect("/urls");
+  const newUser = addNewUser(req.body, usersDatabase);
+  res.cookie("user_id", newUser.id)
+  console.log("NEW USER-------: ", newUser);
+  res.redirect('/urls');
  }
 })
 

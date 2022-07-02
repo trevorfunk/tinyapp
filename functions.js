@@ -1,3 +1,6 @@
+const req = require("express/lib/request");
+const bcrypt = require('bcryptjs');
+
 const generateRandomString = () => {
  const defaultArray = ["", "", "", "", "", ""]
  const newArray = []
@@ -24,7 +27,8 @@ const emailCheck = (newEmail, database) => {
 const currentUser = (email, password, database) => {
  for (const userId in database) {
   const user = database[userId];
-  if (user.email === email && user.password === password) {
+  console.log("current user from function page", user);
+  if (user.email === email && bcrypt.compareSync(password, user.password)) {
    return user;
   }
  }
@@ -45,6 +49,17 @@ const url = UrlDatabase[key]
 return userUrls;
 };
 
+const addNewUser = (newUser, database) => {
+ const userId = generateRandomString()
+ newUser.id = userId;
+ newUser.password = bcrypt.hashSync(newUser.password, 10);
+ database[userId] = newUser;
+ return newUser;
+}
+
+
+
+
 const isIdOwner = (userId, shortURL, database) => !userId ? false : userId === database[shortURL].userID
 
-module.exports = { generateRandomString, emailCheck, currentUser, checkShortUrl, urlsForUser, isIdOwner };
+module.exports = { generateRandomString, emailCheck, currentUser, checkShortUrl, urlsForUser, isIdOwner, addNewUser, };
