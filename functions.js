@@ -27,7 +27,7 @@ const emailCheck = (newEmail, database) => {
 const currentUser = (email, password, database) => {
  for (const userId in database) {
   const user = database[userId];
-  console.log("current user from function page", user);
+  console.log("current user from function", user);
   if (user.email === email && bcrypt.compareSync(password, user.password)) {
    return user;
   }
@@ -57,9 +57,16 @@ const addNewUser = (newUser, database) => {
  return newUser;
 }
 
-
+const getUserByEmail = (email, database) => {
+  for (let key in database) {
+    if (database[key].email === email) {
+      return database[key];
+    }
+  }
+  return undefined;
+};
 
 
 const isIdOwner = (userId, shortURL, database) => !userId ? false : userId === database[shortURL].userID
 
-module.exports = { generateRandomString, emailCheck, currentUser, checkShortUrl, urlsForUser, isIdOwner, addNewUser, };
+module.exports = { generateRandomString, emailCheck, currentUser, checkShortUrl, urlsForUser, isIdOwner, addNewUser, getUserByEmail };

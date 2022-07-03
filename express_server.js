@@ -2,6 +2,7 @@ const { generateRandomString, emailCheck, currentUser, checkShortUrl, urlsForUse
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const bcrypt = require('bcryptjs');
+const cookieSession = require('cookie-session');
 const app = express();
 const bodyParser = require("body-parser");
 const PORT = 8080;
@@ -9,6 +10,10 @@ const PORT = 8080;
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieSession({
+  name: 'session',
+  keys: ['userId']
+}));
 app.use(cookieParser())
 
 const usersDatabase = {
@@ -47,14 +52,14 @@ app.get('/u/:shortURL', (req, res) => {
 });
 
 app.get("/login", (req, res) => {
- const userId = req.cookies["user_id"]
+ const userId = req.session.user_id
  const user = usersDatabase[userId]
  const templateVars = { user }
  res.render("login", templateVars)
 });
 
 app.get("/urls", (req, res) => {
- const userId = req.cookies["user_id"]
+ const userId = req.session.user_id
  const user = usersDatabase[userId]
  if (!user) {
   res.status(400).send('Please login or register to view URLs');
@@ -66,7 +71,7 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
- const userId = req.cookies["user_id"]
+ const userId = req.session.user_id
  const user = usersDatabase[userId]
  const templateVars = { user }
  if (!userId) {
@@ -79,7 +84,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL/edit", (req, res) => {
- const userId = req.cookies["user_id"];
+ const userId = req.session.user_id;
  const user = usersDatabase[userId];
  const shortURL = req.params.shortURL;
  const longURL = urlDatabase[shortURL].longURL
@@ -94,7 +99,7 @@ app.get("/register", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
  const shortURL = req.params.shortURL
- const userId = req.cookies["user_id"]
+ const userId = req.session.user_id
  const user = usersDatabase[userId]
 if(!user) {
  res.send("no access")
@@ -118,14 +123,14 @@ if (checkShortUrl(shortURL, urlDatabase)) {
 // POST ROUTES //
 app.post("/urls", (req, res) => {
  const shortURL = generateRandomString()
- const userID = req.cookies.user_id
- const longURL = req.body.longURL
- urlDatabase[shortURL] = { userID, longURL }
+ const userID = req.session.user_id;
+ const longURL = req.body.longURL;
+ urlDatabase[shortURL] = { userID, longURL };
  res.redirect(`/urls`);
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
- const userId = req.cookies["user_id"];
+ const userId = req.session.user_id;
  const shortURL = req.params.shortURL
  if (!isIdOwner(userId, shortURL, urlDatabase)) {
   res.send('You do not have permission to delete');
@@ -136,13 +141,14 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 })
 
 app.post("/urls/:shortURL/edit", (req, res) => {
- const userId = req.cookies["user_id"];
+ console.log("hello");
+ const userID = req.session.user_id;
  const shortURL = req.params.shortURL
  const longURL = req.body.longURL
- if (!isIdOwner(userId, shortURL, urlDatabase)) {
+ if (!isIdOwner(userID, shortURL, urlDatabase)) {
   res.send('You do not have permission to edit');
  } else {
-  urlDatabase[shortURL] = { userId, longURL }
+  urlDatabase[shortURL] = { userID, longURL }
  res.redirect(`/urls`);
  }
 })
@@ -154,13 +160,14 @@ app.post("/login", (req, res) => {
   res.status(403).send('user not found');
  }
  if (user) {
-  res.cookie("user_id", user.id);
+  req.session.user_id = user.id
   res.redirect("/urls");
  }
 });
 
 app.post("/logout", (req, res) => {
- res.clearCookie("user_id");
+ req.session = null
+ //res.clearCookie("user_id");
  res.redirect("/login");
 });
 
@@ -173,7 +180,7 @@ app.post("/register", (req, res) => {
   res.status(400).send('user email already in use');
  } else {
   const newUser = addNewUser(req.body, usersDatabase);
-  res.cookie("user_id", newUser.id)
+  req.session.user_id = newUser.id;
   console.log("NEW USER-------: ", newUser);
   res.redirect('/urls');
  }
