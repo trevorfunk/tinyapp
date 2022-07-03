@@ -1,7 +1,7 @@
 const req = require("express/lib/request");
 const bcrypt = require('bcryptjs');
 
-const generateRandomString = () => {
+const generateRandomString = () => { // creates random 6 digit code use for id
  const defaultArray = ["", "", "", "", "", ""]
  const newArray = []
 
@@ -65,7 +65,6 @@ const getUserByEmail = (email, database) => {
   }
   return undefined;
 };
-
 
 const isIdOwner = (userId, shortURL, database) => !userId ? false : userId === database[shortURL].userID
 

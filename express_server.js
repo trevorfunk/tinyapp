@@ -1,7 +1,6 @@
 const { generateRandomString, emailCheck, currentUser, checkShortUrl, urlsForUser, isIdOwner, addNewUser } = require("./functions");
 const express = require("express");
 const cookieParser = require("cookie-parser");
-const bcrypt = require('bcryptjs');
 const cookieSession = require('cookie-session');
 const bodyParser = require("body-parser");
 
@@ -32,7 +31,6 @@ const urlDatabase = {
 };
 
 // GET ROUTES //
-
 app.get('/u/:shortURL', (req, res) => {
   let shortURL = req.params.shortURL;
   if (checkShortUrl(shortURL, urlDatabase)) {
@@ -107,9 +105,8 @@ app.get("/urls/:shortURL", (req, res) => {
   }
 });
 
-
 // POST ROUTES //
-app.post("/urls", (req, res) => {
+app.post("/urls", (req, res) => { 
   const shortURL = generateRandomString();
   const userID = req.session.user_id;
   const longURL = req.body.longURL;
@@ -117,7 +114,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls`);
 });
 
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.post("/urls/:shortURL/delete", (req, res) => { // make sure user has permission
   const userId = req.session.user_id;
   const shortURL = req.params.shortURL;
   if (!isIdOwner(userId, shortURL, urlDatabase)) {
@@ -128,7 +125,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   }
 });
 
-app.post("/urls/:shortURL/edit", (req, res) => {
+app.post("/urls/:shortURL/edit", (req, res) => { // Make sure the proper user is editing URL
   const userID = req.session.user_id;
   const shortURL = req.params.shortURL;
   const longURL = req.body.longURL;
@@ -140,7 +137,7 @@ app.post("/urls/:shortURL/edit", (req, res) => {
   }
 });
 
-app.post("/login", (req, res) => {
+app.post("/login", (req, res) => { // make sure there is a matching user with matching password. 
   const { email, password } = req.body;
   const user = currentUser(email, password, usersDatabase);
   if (!user) {
@@ -152,12 +149,12 @@ app.post("/login", (req, res) => {
   }
 });
 
-app.post("/logout", (req, res) => {
-  req.session = null;
+app.post("/logout", (req, res) => { 
+  req.session = null; // delete cookie when logging out
   res.redirect("/login");
 });
 
-app.post("/register", (req, res) => {
+app.post("/register", (req, res) => { //make sure user isn't in use and have email and password
   const { email, password } = req.body;
   if (email === '' || password === '') {
     res.status(400).send('Both email and password are required');
