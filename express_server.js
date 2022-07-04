@@ -62,7 +62,7 @@ app.get("/urls", (req, res) => {
   const userId = req.session.user_id;
   const user = usersDatabase[userId];
   if (!user) {
-    res.status(400).send('Please login or register to view URLs');
+    res.render("urls_error")
   } else {
     const usersURLs = urlsForUser(user, urlDatabase);
     const templateVars = { user, urls: usersURLs };
@@ -75,7 +75,7 @@ app.get("/urls/new", (req, res) => {
   const user = usersDatabase[userId];
   const templateVars = { user };
   if (!userId) {
-    res.redirect("/login");
+    res.render("urls_error");
   } else {
     res.render("urls_new", templateVars);
   }
