@@ -31,6 +31,16 @@ const urlDatabase = {
 };
 
 // GET ROUTES //
+app.get("/", (req, res) => {
+  const userId = req.session.user_id;
+  const user = usersDatabase[userId];
+  if (!user) {
+    res.redirect(`/login`);
+  } else {
+    res.redirect('/urls');
+  }
+});
+
 app.get('/u/:shortURL', (req, res) => {
   let shortURL = req.params.shortURL;
   if (checkShortUrl(shortURL, urlDatabase)) {
