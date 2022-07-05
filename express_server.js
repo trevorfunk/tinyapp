@@ -33,8 +33,7 @@ const urlDatabase = {
 // GET ROUTES //
 app.get("/", (req, res) => {
   const userId = req.session.user_id;
-  const user = usersDatabase[userId];
-  if (!user) {
+  if (!userId) {
     res.redirect(`/login`);
   } else {
     res.redirect('/urls');
@@ -60,10 +59,10 @@ app.get("/login", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const userId = req.session.user_id;
-  const user = usersDatabase[userId];
-  if (!user) {
-    res.render("urls_error")
+  if (!userId) {
+    res.render("urls_error");
   } else {
+    const user = usersDatabase[userId];
     const usersURLs = urlsForUser(user, urlDatabase);
     const templateVars = { user, urls: usersURLs };
     res.render("urls_index", templateVars);
@@ -72,11 +71,11 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   const userId = req.session.user_id;
-  const user = usersDatabase[userId];
-  const templateVars = { user };
   if (!userId) {
     res.render("urls_error");
   } else {
+    const user = usersDatabase[userId];
+    const templateVars = { user };
     res.render("urls_new", templateVars);
   }
 });
@@ -111,12 +110,12 @@ app.get("/urls/:shortURL", (req, res) => {
       res.render("urls_show", templateVars);
     }
   } else {
-    res.send('URL DOESNT EXIST');
+    res.send('URL does not exist');
   }
 });
 
 // POST ROUTES //
-app.post("/urls", (req, res) => { 
+app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   const userID = req.session.user_id;
   const longURL = req.body.longURL;
@@ -147,7 +146,7 @@ app.post("/urls/:shortURL/edit", (req, res) => { // Make sure the proper user is
   }
 });
 
-app.post("/login", (req, res) => { // make sure there is a matching user with matching password. 
+app.post("/login", (req, res) => { // make sure there is a matching user with matching password.
   const { email, password } = req.body;
   const user = currentUser(email, password, usersDatabase);
   if (!user) {
@@ -159,7 +158,7 @@ app.post("/login", (req, res) => { // make sure there is a matching user with ma
   }
 });
 
-app.post("/logout", (req, res) => { 
+app.post("/logout", (req, res) => {
   req.session = null; // delete cookie when logging out
   res.redirect("/login");
 });
